@@ -88,3 +88,5 @@ App will be available at:
 
 **Made with ❤️ by [Deepak Nehra](https://www.linkedin.com/in/deepak-nehra/)**
 *"Chai ke sath Code kerte raho!"* ☕
+
+![Chat page preview](https://res.cloudinary.com/nehra1800/image/upload/v1755249408/Screenshot_2025-08-15_143230_s9vub1.png)
