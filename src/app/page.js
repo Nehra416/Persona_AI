@@ -1,13 +1,15 @@
-import HeroSection from "@/components/HeroSection";
 import CardsContainer from "@/components/CardsContainer";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import HeroSection from "@/components/HeroSection";
 
 export default function Home() {
   return (
-    <div>
+    <>
+      <Header />
       <HeroSection />
       <CardsContainer />
       <Footer />
-    </div>
+    </>
   );
 }

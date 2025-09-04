@@ -30,7 +30,7 @@ const TeacherCard = ({ teacher, index }) => {
                                     <CardDescription className="mt-1 text-sm md:text-base">{teacher.role}</CardDescription>
                                 </div>
                             </div>
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-background/60">
+                            <div className="md:flex hidden h-12 w-12 items-center justify-center rounded-xl border bg-background/60">
                                 <MessageSquare className="h-5 w-5" />
                             </div>
                         </div>

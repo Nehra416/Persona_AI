@@ -1,10 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import { ThemeProvider } from "next-themes";
-import { InitThemeToLocalStorage } from "@/lib/InitThemeToLocalStorage";
-import { Analytics } from '@vercel/analytics/next'
-
+import { Toaster } from "@/components/ui/sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -16,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Persona Ai",
-  description: "Chat with our mentors",
+  title: "Persona AI",
+  description: "Created by Deepak Nehra",
 };
 
 export default function RootLayout({ children }) {
@@ -27,10 +24,8 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <InitThemeToLocalStorage />
-          <Header />
           {children}
-          <Analytics mode="production" />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

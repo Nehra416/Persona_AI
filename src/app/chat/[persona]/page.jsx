@@ -1,29 +1,37 @@
-'use client';
+'use client'
+
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SendHorizonal } from 'lucide-react';
+import { SendHorizonal, CopyIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
-import rehypeSanitize from 'rehype-sanitize';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 import TypingIndicator from '@/components/TypingIndicator';
-import { useParams } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
+import ChatHeader from '@/components/ChatHeader';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 export default function ChatPage() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const params = useParams();
     const bottomRef = useRef(null);
     const { theme } = useTheme();
-    const [personaName, setPersonaName] = useState('');
+    const [personaName, setPersonaName] = useState(params?.persona);
+    const [totalChats, setTotalChats] = useState(localStorage.getItem("total_chats") || 0);
 
-    const params = useParams();
 
     useEffect(() => {
-        if (params?.persona_name) {
-            setPersonaName(params.persona_name);
+        if (params?.persona) {
+            setPersonaName(params.persona);
         }
+        if (personaName !== 'piyush' && personaName !== 'hitesh')
+            notFound();
     }, [params]);
 
     const displayedMessages = isLoading
@@ -37,6 +45,14 @@ export default function ChatPage() {
     const handleSendMessage = async () => {
         if (!input.trim()) return;
 
+        const count = localStorage.getItem("total_chats") || 0;
+        const newCount = parseInt(count) + 1;
+        localStorage.setItem("total_chats", newCount);
+        setTotalChats(newCount);
+        if (newCount === 10) {
+            return toast.error("You reached the limit of 10 chats.");
+        }
+
         setIsLoading(true);
         const newMessage = { role: 'user', content: input, time: new Date() };
         const updatedMessages = [...messages, newMessage];
@@ -44,13 +60,14 @@ export default function ChatPage() {
         setInput('');
 
         try {
-            const response = await axios.post(`/api/chat/${personaName}`, { messages: updatedMessages });
+            const response = await axios.post(`/api/chat`, { messages: updatedMessages, teacher_name: personaName });
             setMessages((prevMessages) => [
                 ...prevMessages,
                 { role: 'assistant', content: response.data.content, time: new Date() },
             ]);
         } catch (error) {
             console.error('Error:', error);
+            toast.error(error.response.data.error);
         } finally {
             setIsLoading(false);
         }
@@ -61,13 +78,14 @@ export default function ChatPage() {
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter') handleSendMessage();
+        if (e.key === 'Enter' && !isLoading) handleSendMessage();
     };
 
     return (
         <div className={`flex flex-col h-screen pt-16 transition-colors duration-300 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
+            <ChatHeader count={totalChats} />
             {/* Messages */}
-            <main className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
+            <section className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
                 <AnimatePresence initial={false}>
                     {displayedMessages.map((msg, idx) => (
                         <motion.div
@@ -94,16 +112,25 @@ export default function ChatPage() {
                                             : 'bg-gray-200 text-gray-900'
                                         }`}
                                     >
-                                        <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            rehypePlugins={[rehypeHighlight]}
+                                        >
                                             {msg.content}
                                         </ReactMarkdown>
                                     </div>
 
                                     {/* Time */}
                                     <div
-                                        className={`text-xs opacity-70 mt-1 w-full ${msg.role === 'user' ? 'text-right' : 'text-left'}`}
+                                        className={`text-xs flex items-center gap-1 ml-2 opacity-70 mt-1 w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                     >
                                         {formatTime(msg.time)}
+                                        <Button variant="ghost" size="icon" onClick={() => {
+                                            navigator.clipboard.writeText(msg.content)
+                                            toast.success('Copied to clipboard')
+                                        }}>
+                                            <CopyIcon className='w-4 h-4' />
+                                        </Button>
                                     </div>
                                 </div>
 
@@ -112,10 +139,10 @@ export default function ChatPage() {
                     ))}
                 </AnimatePresence>
                 <div ref={bottomRef} />
-            </main>
+            </section>
 
             {/* Input Area */}
-            <div className="p-4 border-t">
+            <section className="p-4 border-t">
                 <div
                     className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 ${theme === 'dark'
                         ? 'bg-gray-800 text-gray-200 border border-gray-700'
@@ -131,7 +158,7 @@ export default function ChatPage() {
                         onKeyDown={handleKeyDown}
                     />
                     <button
-                        onClick={handleSendMessage}
+                        onClick={isLoading ? null : handleSendMessage}
                         className={`p-2 rounded-md hover:scale-105 transition-all ${theme === 'dark' ? 'bg-[#4682B4]' : 'bg-[#06B6D4]'}`}
                     >
                         {isLoading ? (
@@ -141,7 +168,7 @@ export default function ChatPage() {
                         )}
                     </button>
                 </div>
-            </div>
+            </section>
         </div>
     );
 }

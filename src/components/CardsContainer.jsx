@@ -41,7 +41,7 @@ const CardsContainer = () => {
             </motion.div>
 
             {/* More mentors coming soon */}
-            <motion.div
+            <div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
@@ -51,7 +51,7 @@ const CardsContainer = () => {
                     More mentors coming soon. Want a custom persona?{' '}
                     <a href="https://www.linkedin.com/in/deepak-nehra/" target='_blank' className="underline underline-offset-4 hover:text-foreground">Contact us</a>.
                 </p>
-            </motion.div>
+            </div>
         </section>
     )
 }

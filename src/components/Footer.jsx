@@ -7,7 +7,9 @@ const Footer = () => {
             <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 text-sm text-muted-foreground">
                 <span>© {new Date().getFullYear()} Persona AI</span>
                 <div className="flex items-center gap-3">
-                    <Badge variant="secondary" className="rounded-full">Made By Deepak Nehra ⚡</Badge>
+                    <a href="https://www.linkedin.com/in/deepak-nehra/" target='_blank' className="underline underline-offset-4 hover:text-foreground">
+                        <Badge variant="secondary" className="rounded-full">Made By Deepak Nehra ⚡</Badge>
+                    </a>
                 </div>
             </div>
         </footer>
